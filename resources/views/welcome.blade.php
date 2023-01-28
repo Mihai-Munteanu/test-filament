@@ -13,6 +13,8 @@
 
 </head>
 <body class="antialiased">
+    go to /admin
+
     @livewireScripts
 </body>
 </html>

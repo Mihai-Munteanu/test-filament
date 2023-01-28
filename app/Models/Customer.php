@@ -2,10 +2,21 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\ActiveListing;
 use Illuminate\Database\Eloquent\Model;
 
 class Customer extends Model
 {
-    use HasFactory;
+    protected $guarded = ['id'];
+    public $table = 'customers';
+
+    public function activeListings()
+    {
+        return $this->hasMany(ActiveListing::class, 'customer_id', 'id');
+    }
+
+    public function activeListingByDate()
+    {
+        return $this->hasOne(ActiveListing::class, 'customer_id', 'id')->where('date', $this->date);
+    }
 }

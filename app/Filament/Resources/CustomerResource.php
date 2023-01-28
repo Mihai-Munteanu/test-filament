@@ -6,20 +6,22 @@ use Filament\Forms;
 use Filament\Tables;
 use App\Models\Customer;
 use Filament\Resources\Form;
+use App\Models\ActiveListing;
 use Filament\Resources\Table;
 use Illuminate\Support\Carbon;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Card;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\Layout;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Model;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\CustomerResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\CustomerResource\RelationManagers;
-use Filament\Forms\Components\Card;
-use Filament\Forms\Components\TextInput;
 
 class CustomerResource extends Resource
 {
@@ -29,15 +31,20 @@ class CustomerResource extends Resource
 
     protected static ?string $navigationGroup = 'Customers';
 
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Card::make()->schema([
-                    TextInput::make('account_status')->required(),
-                    TextInput::make('notification_email_1'),
-                    TextInput::make('notification_email_2'),
-                ])
+                // Card::make()->schema([
+                //     TextInput::make('account_status')->required(),
+                //     TextInput::make('notification_email_1'),
+                //     TextInput::make('notification_email_2'),
+                // ])
             ]);
     }
 
@@ -45,21 +52,21 @@ class CustomerResource extends Resource
     {
         return [
             // filter by account_status
-            SelectFilter::make('status')
-                ->options([
-                    'internal' => 'Internal',
-                    'external' => 'External',
-                    'beta' => 'Beta',
-                ])
-                ->attribute('account_status'),
+            // SelectFilter::make('status')
+            //     ->options([
+            //         'internal' => 'Internal',
+            //         'external' => 'External',
+            //         'beta' => 'Beta',
+            //     ])
+            //     ->attribute('account_status'),
 
-            // filter period
-            Filter::make('created_at')
-                ->form([
-                    DatePicker::make('from'),
-                    DatePicker::make('until'),
-                ])
-                ->attribute('date')
+            // // filter period
+            // Filter::make('created_at')
+            //     ->form([
+            //         DatePicker::make('from'),
+            //         DatePicker::make('until'),
+            //     ])
+            //     ->attribute('date')
             // ->indicateUsing(function (array $data): array {
             //     $indicators = [];
 
@@ -82,23 +89,52 @@ class CustomerResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('customer_id')->sortable()->searchable(),
-                TextColumn::make('customer_registration_date')->sortable()->dateTime('d/m/Y'),
-                TextColumn::make('active_listings')->sortable(),
-                TextColumn::make('cross-linked_active_listings')->sortable(),
-                TextColumn::make('cross-linked_sales_count')->sortable(),
-                TextColumn::make('cross-linked_sales_value')->sortable(),
+                // TextColumn::make('customer_id')->withSum('active_listings', 'number_of_guest_accounts')->sortable()->searchable(),
+                // TextColumn::make('customer_id')
+                // // ->sum('active_listings', 'customer_id')
+                // ,
+                TextColumn::make('date')->dateTime('Y-m-d')->sortable()->searchable(),
+                // Model care sa aiba coloana customer_id, created_at, active_listings, platform_mecari, plat_ebay, plat_postmark nu este afectat de daterange
+                // TextColumn::make('active_listings')->sortable(),
+                TextColumn::make('activeListings.active_listing_mercari')->sortable()->label('Active Listings Mercari'),
+
+                TextColumn::make('activeListings.active_listing_mercari')
+                    ->getStateUsing(function (Model $record): float {
+                        info('record: ' . collect($record->activeListingByDate));
+                        return $record->activeListingByDate->active_listing_mercari + $record->activeListingByDate->active_listing_ebay + $record->activeListingByDate->active_listing_poshmark;
+                    })->label('Active Listing Total'),
+
+
+
+                // same as above (cel putin 2 platforme)
+                TextColumn::make('cross_linked_active_listings')->sortable(),
+
+                // same as above, on sales, aici merge date-range
+                TextColumn::make('cross_linked_sales_count')->sortable(),
+
+                // same as above, on sales, gross revenue
+                TextColumn::make('cross_linked_sales_value')->sortable(),
+
+                // same as above
                 // TextColumn::make('all_sales_count')->sortable(),
+
                 // TextColumn::make('all_sales_value')->sortable(),
                 // TextColumn::make('treecat_revenue')->sortable(),
                 // TextColumn::make('new_listings_downloaded_from_ecommerce_platforms')->sortable(),
                 // TextColumn::make('successful_new_listing_count')->sortable(),
-                // TextColumn::make('de-listing_fail_count')->sortable(),
-                // TextColumn::make('de-listing_success_count')->sortable(),
+                // TextColumn::make('de_listing_fail_count')->sortable(),
+                // TextColumn::make('de_listing_success_count')->sortable(),
+
                 // TextColumn::make('notification_email_1')->sortable()->searchable(),
                 // TextColumn::make('notification_email_2')->sortable()->searchable(),
+
                 TextColumn::make('number_of_guest_accounts')->sortable(),
+
+
                 TextColumn::make('account_status')->sortable(),
-                TextColumn::make('created_at')->sortable()->searchable()->dateTime('d/m/Y'),
+                TextColumn::make('customer_registration_date')->sortable()->dateTime('Y-m-d'),
+
+                TextColumn::make('created_at')->sortable()->searchable()->dateTime('Y-m-d'),
             ])
             ->filters(
                 [
@@ -157,11 +193,11 @@ class CustomerResource extends Resource
                 // layout: Layout::AboveContent,
             )
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                // Tables\Actions\EditAction::make(),
+                // Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+                // Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 
@@ -177,7 +213,7 @@ class CustomerResource extends Resource
         return [
             'index' => Pages\ListCustomers::route('/'),
             // 'create' => Pages\CreateCustomer::route('/create'),
-            'edit' => Pages\EditCustomer::route('/{record}/edit'),
+            // 'edit' => Pages\EditCustomer::route('/{record}/edit'),
         ];
     }
 }

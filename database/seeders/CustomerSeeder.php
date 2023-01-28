@@ -2,13 +2,23 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\Customer;
-use App\Models\EbayCustomer;
-use App\Models\MercariCustomer;
+use App\Models\ActiveListing;
+use App\Models\AllSalesCount;
+use App\Models\AllSalesValue;
+use App\Models\CustomerStatus;
+use App\Models\TreecatRevenue;
 use Illuminate\Database\Seeder;
-use App\Models\PoshmarkCustomer;
-use App\Models\MercariCustomerData;
+use App\Models\DeListingFailCount;
+use App\Models\NotificationEmail1s;
+use App\Models\NotificationEmail2s;
+use App\Models\NumberOfGuestAccount;
+use App\Models\CrossLinkedSalesCount;
+use App\Models\CrossLinkedSalesValue;
+use App\Models\DeListingSuccessCount;
+use App\Models\CrossLinkedActiveListing;
+use App\Models\SuccessfulNewListingCount;
+use App\Models\NewListingDownloadedPlatform;
 
 class CustomerSeeder extends Seeder
 {
@@ -19,69 +29,153 @@ class CustomerSeeder extends Seeder
      */
     public function run()
     {
-        $statuses = ['internal', 'external', 'beta'];
 
-        for ($i = 0; $i < 100; $i++) {
-            $customerData = [
-                'customer_id' => 100 + $i,
-                'customer_registration_date' => now(),
-                'active_listings' => 100 + $i,
-                'cross-linked_active_listings' => 200 + $i,
-                'cross-linked_sales_count' => 44 + $i,
-                'cross-linked_sales_value' => 7000 + $i,
-                'number_of_guest_accounts' => 300 + $i,
-                'account_status' => $statuses[array_rand($statuses)],
+        $statuses = [
+            ['name' => 'internal'],
+            ['name' => 'external'],
+            ['name' => 'beta']
+        ];
 
-                'notification_email_1' => 'notification_email_1' . $i,
-                'notification_email_2' => 'notification_email_2' . $i,
-                'date' => now(),
-            ];
+        CustomerStatus::upsert($statuses, ['name'], ['name']);
 
-            $customer = Customer::firstOrCreate($customerData);
+        for ($i = 0; $i < 10; $i++) {
+            for ($y = 0; $y < 10; $y++) {
 
-            $mercariCustomerData = [
-                'customer_id' => $customer->id,
-                'all_sales_count' => 400 + $i,
-                'all_sales_value' => 900 + $i,
-                'treecat_revenue' => 1000 + $i,
-                'new_listings_downloaded_from_ecommerce_platforms' => 123 + $i,
-                'successful_new_listing_count' => 42 + $i,
-                'de-listing_fail_count' => 21 + $i,
-                'de-listing_success_count' => 98 + $i,
-                'date' => now(),
-            ];
+                $customerData = [
+                    'customer_id' => 100 + $i,
+                    'date' => now()->addDays($y),
+                    'customer_registration_date' => now(),
+                    'account_status_id' => rand(1, 3),
+                ];
 
-            MercariCustomer::firstOrCreate($mercariCustomerData);
+                $customer = Customer::create($customerData);
 
-            $poshmarkCustomerData = [
-                'customer_id' => $customer->id,
-                'all_sales_count' => 600 + $i,
-                'all_sales_value' => 12000 + $i,
-                'treecat_revenue' => 3000 + $i,
-                'new_listings_downloaded_from_ecommerce_platforms' => 134 + $i,
-                'successful_new_listing_count' => 445 + $i,
-                'de-listing_fail_count' => 23 + $i,
-                'de-listing_success_count' => 101 + $i,
-                'date' => now(),
-            ];
+                $x = [
+                    'customer_id' => $customer->id,
+                    'date' => now()->addDays($y),
+                    'active_listing_mercari' => 100 + $i + $y,
+                    'active_listing_ebay' => 200 + $i + $y,
+                    'active_listing_poshmark' => 300 + $i + $y,
+                ];
+                ActiveListing::firstOrCreate($x);
 
+                $q = [
+                    'customer_id' => $customer->id,
+                    'date' => now()->addDays($y),
+                    'cross_linked_active_listing_mercari' => 100 + $i + $y,
+                    'cross_linked_active_listing_ebay' => 200 + $i + $y,
+                    'cross_linked_active_listing_poshmark' => 300 + $i + $y,
+                ];
+                CrossLinkedActiveListing::firstOrCreate($q);
 
-            PoshmarkCustomer::firstOrCreate($poshmarkCustomerData);
+                $z = [
+                    'customer_id' => $customer->id,
+                    'date' => now()->addDays($y),
+                    'cross_linked_sales_count_mercari' => 100 + $i + $y,
+                    'cross_linked_sales_count_ebay' => 200 + $i + $y,
+                    'cross_linked_sales_count_poshmark' => 300 + $i + $y,
+                ];
+                CrossLinkedSalesCount::firstOrCreate($z);
 
+                $w = [
+                    'customer_id' => $customer->id,
+                    'date' => now()->addDays($y),
+                    'cross_linked_sales_value_mercari' => 100 + $i + $y,
+                    'cross_linked_sales_value_ebay' => 200 + $i + $y,
+                    'cross_linked_sales_value_poshmark' => 300 + $i + $y,
+                ];
+                CrossLinkedSalesValue::firstOrCreate($w);
 
-            $ebayCustomerData = [
-                'customer_id' => $customer->id,
-                'all_sales_count' => 700 + $i,
-                'all_sales_value' => 20000 + $i,
-                'treecat_revenue' => 4000 + $i,
-                'new_listings_downloaded_from_ecommerce_platforms' => 233 + $i,
-                'successful_new_listing_count' => 644 + $i,
-                'de-listing_fail_count' => 52 + $i,
-                'de-listing_success_count' => 109 + $i,
-                'date' => now(),
-            ];
+                $xy = [
+                    'customer_id' => $customer->id,
+                    'date' => now()->addDays($y),
+                    'all_sales_count_mercari' => 100 + $i + $y,
+                    'all_sales_count_ebay' => 200 + $i + $y,
+                    'all_sales_count_poshmark' => 300 + $i + $y,
+                ];
+                AllSalesCount::firstOrCreate($xy);
 
-            EbayCustomer::firstOrCreate($ebayCustomerData);
+                $xz = [
+                    'customer_id' => $customer->id,
+                    'date' => now()->addDays($y),
+                    'all_sales_value_mercari' => 100 + $i + $y,
+                    'all_sales_value_ebay' => 200 + $i + $y,
+                    'all_sales_value_poshmark' => 300 + $i + $y,
+                ];
+                AllSalesValue::firstOrCreate($xz);
+
+                $xw = [
+                    'customer_id' => $customer->id,
+                    'date' => now()->addDays($y),
+                    'treecat_revenue_mercari' => 100 + $i + $y,
+                    'treecat_revenue_ebay' => 200 + $i + $y,
+                    'treecat_revenue_poshmark' => 300 + $i + $y,
+                ];
+                TreecatRevenue::firstOrCreate($xw);
+
+                $yz = [
+                    'customer_id' => $customer->id,
+                    'date' => now()->addDays($y),
+                    'new_listings_downloaded_platform_mercari' => 100 + $i + $y,
+                    'new_listings_downloaded_platform_ebay' => 200 + $i + $y,
+                    'new_listings_downloaded_platform_poshmark' => 300 + $i + $y,
+                ];
+                NewListingDownloadedPlatform::firstOrCreate($yz);
+
+                $yw = [
+                    'customer_id' => $customer->id,
+                    'date' => now()->addDays($y),
+                    'successful_new_listing_count_mercari' => 100 + $i + $y,
+                    'successful_new_listing_count_ebay' => 200 + $i + $y,
+                    'successful_new_listing_count_poshmark' => 300 + $i + $y,
+                ];
+                SuccessfulNewListingCount::firstOrCreate($yw);
+
+                $zw = [
+                    'customer_id' => $customer->id,
+                    'date' => now()->addDays($y),
+                    'de_listing_fail_count_mercari' => 100 + $i + $y,
+                    'de_listing_fail_count_ebay' => 200 + $i + $y,
+                    'de_listing_fail_count_poshmark' => 300 + $i + $y,
+                ];
+                DeListingFailCount::firstOrCreate($zw);
+
+                $xyz = [
+                    'customer_id' => $customer->id,
+                    'date' => now()->addDays($y),
+                    'de_listing_success_count_mercari' => 100 + $i + $y,
+                    'de_listing_success_count_ebay' => 200 + $i + $y,
+                    'de_listing_success_count_poshmark' => 300 + $i + $y,
+                ];
+                DeListingSuccessCount::firstOrCreate($xyz);
+
+                $xyw = [
+                    'customer_id' => $customer->id,
+                    'date' => now()->addDays($y),
+                    'notification_email_1_mercari' => 100 + $i + $y,
+                    'notification_email_1_ebay' => 200 + $i + $y,
+                    'notification_email_1_poshmark' => 300 + $i + $y,
+                ];
+                NotificationEmail1s::firstOrCreate($xyw);
+
+                $yzw = [
+                    'customer_id' => $customer->id,
+                    'date' => now()->addDays($y),
+                    'notification_email_2_mercari' => 100 + $i + $y,
+                    'notification_email_2_ebay' => 200 + $i + $y,
+                    'notification_email_2_poshmark' => 300 + $i + $y,
+                ];
+                NotificationEmail2s::firstOrCreate($yzw);
+
+                $xyzw = [
+                    'customer_id' => $customer->id,
+                    'date' => now()->addDays($y),
+                    'number_of_guest_account_mercari' => 100 + $i + $y,
+                    'number_of_guest_account_ebay' => 200 + $i + $y,
+                    'number_of_guest_account_poshmark' => 300 + $i + $y,
+                ];
+                NumberOfGuestAccount::firstOrCreate($xyzw);
+            }
         }
     }
 }
