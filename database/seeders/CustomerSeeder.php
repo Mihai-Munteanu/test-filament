@@ -45,19 +45,21 @@ class CustomerSeeder extends Seeder
                     'customer_id' => 100 + $i,
                     'date' => now()->addDays($y),
                     'customer_registration_date' => now(),
-                    'account_status_id' => rand(1, 3),
+                    'customer_status_id' => rand(1, 3),
                 ];
 
                 $customer = Customer::create($customerData);
 
-                $x = [
-                    'customer_id' => $customer->id,
-                    'date' => now()->addDays($y),
-                    'active_listing_mercari' => 100 + $i + $y,
-                    'active_listing_ebay' => 200 + $i + $y,
-                    'active_listing_poshmark' => 300 + $i + $y,
-                ];
-                ActiveListing::firstOrCreate($x);
+                foreach (['mercari', 'ebay', 'poshmark'] as $platform) {
+
+                    $x = [
+                        'customer_id' => $customer->id,
+                        'date' => now()->addDays($y),
+                        'active_listing' => '100' + $i + $y,
+                        'platform' => $platform,
+                    ];
+                    ActiveListing::firstOrCreate($x);
+                }
 
                 $q = [
                     'customer_id' => $customer->id,
