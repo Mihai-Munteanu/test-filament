@@ -26,6 +26,18 @@
                 <option value="poshmark">poshmark</option>
             </select> --}}
         </div>
+
+        status:
+        <div>
+            <select wire:model="filters.statuses" class="form-select" multiple id="statuses">
+                <option value="all">All</option>
+                <option value="1">internal</option>
+                <option value="2">external</option>
+                <option value="3">beta</option>
+
+            </select>
+        </div>
+
     </div>
 
     Be like water.

@@ -22,6 +22,7 @@ class CustomerFour extends Component
     public $filters = [
         'search' => '',
         'platforms' => [],
+        'statuses' => [],
         'dateStart' => '',
         'dateEnd' => '',
     ];
@@ -133,6 +134,10 @@ class CustomerFour extends Component
             // ->groupBy('customers.customer_id')
             ->when($this->filters['platforms'], function ($query, $platform) {
                 $query->whereIn('al.platform', $platform);
+            })
+            ->when($this->filters['statuses'], function ($query, $status) {
+                info('status: ' . collect($status));
+                $query->whereIn('c.customer_status_id', $status);
             })
             ->when($this->filters['dateStart'], function ($query, $date) {
                 $query->where('al.date', '>=', $date);

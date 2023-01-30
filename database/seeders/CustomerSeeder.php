@@ -17,6 +17,7 @@ use App\Models\CrossLinkedSalesCount;
 use App\Models\CrossLinkedSalesValue;
 use App\Models\DeListingSuccessCount;
 use App\Models\CrossLinkedActiveListing;
+use App\Models\CustomerUnique;
 use App\Models\SuccessfulNewListingCount;
 use App\Models\NewListingDownloadedPlatform;
 
@@ -38,11 +39,19 @@ class CustomerSeeder extends Seeder
 
         CustomerStatus::upsert($statuses, ['name'], ['name']);
 
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 1; $i < 11; $i++) {
+
+            CustomerUnique::create([
+                'name' => 'name ' . $i,
+                'customer_registration_date' => now()->addDays($i),
+                'customer_status_id' => rand(1, 3),
+            ]);
+
             for ($y = 0; $y < 10; $y++) {
 
                 $customerData = [
                     'customer_id' => 100 + $i,
+                    'customer_unique_id' => $i,
                     'date' => now()->addDays($y),
                     'customer_registration_date' => now(),
                     'customer_status_id' => rand(1, 3),

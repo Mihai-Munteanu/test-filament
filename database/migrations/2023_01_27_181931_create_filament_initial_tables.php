@@ -19,19 +19,17 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // Schema::create('customers', function (Blueprint $table) {
-        //     $table->id();
-        //     $table->string('name');
-        //     $table->date('date');
-        //     $table->timestamp('customer_registration_date');
-        //     $table->foreignId('customer_status_id')->constrained('customer_statuses');
-
-        //     $table->unique(['customer_id', 'date']);
-        //     $table->timestamps();
-        // });
+        Schema::create('customer_uniques', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamp('customer_registration_date');
+            $table->foreignId('customer_status_id')->constrained('customer_statuses');
+            $table->timestamps();
+        });
 
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('customer_unique_id')->constrained('customer_uniques')->nullable();
             $table->string('customer_id');
             $table->date('date');
             $table->timestamp('customer_registration_date');
