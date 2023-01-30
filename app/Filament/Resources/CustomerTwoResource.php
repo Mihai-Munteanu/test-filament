@@ -2,16 +2,17 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\CustomerTwoResource\Pages;
-use App\Filament\Resources\CustomerTwoResource\RelationManagers;
-use App\Models\CustomerTwo;
 use Filament\Forms;
-use Filament\Resources\Form;
-use Filament\Resources\Resource;
-use Filament\Resources\Table;
 use Filament\Tables;
+use App\Models\CustomerTwo;
+use Filament\Resources\Form;
+use Filament\Resources\Table;
+use Filament\Resources\Resource;
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\CustomerTwoResource\Pages;
+use App\Filament\Resources\CustomerTwoResource\RelationManagers;
 
 class CustomerTwoResource extends Resource
 {
@@ -33,7 +34,7 @@ class CustomerTwoResource extends Resource
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('customer_id')->sortable()->searchable(),
             ])
             ->filters([
                 //

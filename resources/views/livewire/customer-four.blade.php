@@ -32,16 +32,16 @@
     <table>
         <thead>
             <td class="text-bold text-2xl text-center">
-                id
+                customer_id
             </td>
             <td class="text-bold text-2xl text-center">
-                customer_id
+                total
             </td>
             {{-- <td class="text-bold text-2xl text-center">
                 date
             </td> --}}
             <td class="text-bold text-2xl text-center">
-                Total
+                status
             </td>
             {{-- <td class="text-bold text-2xl px-2 text-center">
                 activeListingMercari
